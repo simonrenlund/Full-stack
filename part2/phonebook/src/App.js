@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import backend from './services/backend'
 
-const Number = ({person}) => {
+const Number = ({person,deleteEntry}) => {
   if (person.display === true) {
-      return <div>{person.name} {person.number}</div>
+      return <div>{person.name} {person.number} <button id={person.id} type="button" onClick={deleteEntry}>Delete</button></div>
   } else { return <span></span>
   }
 }
@@ -14,10 +15,9 @@ const Filter = ({search, searchChange}) => {
     </div>
   )
 }
-
-const Persons = ({persons}) => {
+const Persons = ({persons, deleteEntry}) => {
   const Numbers = () => persons.map(person =>
-    <Number key={person.name} person={person} />
+    <Number key={person.name} person={person} deleteEntry={deleteEntry} />
     )
   return <div>{Numbers()}</div>
 }
@@ -44,15 +44,29 @@ const PersonForm = ({newName,newNumber,inputChange,addPerson}) => {
 
 const App = () => {
   //useStates
-  const [ persons, setPersons] = useState([
+  const [ persons, setPersons] = useState([/*
     { name: 'Arto Hellas', number: '040-123456', display: true},
     { name: 'Ada Lovelace', number: '39-44-5323523', display: true },
     { name: 'Dan Abramov', number: '12-43-234345', display: true },
-    { name: 'Mary Poppendieck', number: '39-23-6423122', display: true }
+    { name: 'Mary Poppendieck', number: '39-23-6423122', display: true }*/
   ])
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
   const [search, setSearch] = useState('')
+
+  useEffect(() => {
+      //console.log('effect')
+      backend
+      .getAll()
+      .then(p => {
+        p.forEach(function(item) {
+          item.display = true
+        })
+        setPersons(p)
+      })
+
+    },[])
+
   //App functions
   const addPerson = (event) => {
     event.preventDefault()
@@ -74,7 +88,9 @@ const App = () => {
       number: newNumber,
       display: true
     }
-    setPersons(persons.concat(nameObject))
+    backend.create(nameObject).then(person => {
+      setPersons(persons.concat(person))
+    })
     setNewName('')
     setNewNumber('')
   }
@@ -102,6 +118,11 @@ const App = () => {
     setPersons(persons)
   }
 
+  const deleteEntry = (event) => {
+    if(window.confirm('Really delete?')) {
+      backend.del(event.target.id)
+    }
+  }
 
   //The render
   return (
@@ -111,7 +132,7 @@ const App = () => {
       <h2>Add new number</h2>
       <PersonForm newName={newName} newNumber={newNumber} inputChange={inputChange} addPerson={addPerson}/>
       <h2>Numbers</h2>
-      <Persons persons={persons} />
+      <Persons persons={persons} deleteEntry={deleteEntry} />
     </div>
   )
 }
