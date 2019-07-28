@@ -1,9 +1,20 @@
 import React, { useState, useEffect } from 'react'
 import backend from './services/backend'
 
+const Notification = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+  return (
+    <div className={message.type}>
+      {message.msg}
+    </div>
+  )
+}
+
 const Number = ({person,deleteEntry}) => {
   if (person.display === true) {
-      return <div>{person.name} {person.number} <button id={person.id} type="button" onClick={deleteEntry}>Delete</button></div>
+      return <div>{person.name} {person.number} <button id={person.id} name={person.name} type="button" onClick={deleteEntry}>Delete</button></div>
   } else { return <span></span>
   }
 }
@@ -15,6 +26,7 @@ const Filter = ({search, searchChange}) => {
     </div>
   )
 }
+
 const Persons = ({persons, deleteEntry}) => {
   const Numbers = () => persons.map(person =>
     <Number key={person.name} person={person} deleteEntry={deleteEntry} />
@@ -23,7 +35,6 @@ const Persons = ({persons, deleteEntry}) => {
 }
 
 const PersonForm = ({newName,newNumber,inputChange,addPerson}) => {
-
   return(
     <form onSubmit={addPerson}>
       <div>
@@ -53,7 +64,7 @@ const App = () => {
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
   const [search, setSearch] = useState('')
-
+  const [message, setMessage] = useState('')
   useEffect(() => {
       //console.log('effect')
       backend
@@ -73,10 +84,40 @@ const App = () => {
     let same = 0
     persons.forEach(function(item) {
       if (item.name === newName) {
-        alert(newName + ' is already added to the phonebook')
         same = 1
-        return
+        if (item.number === newNumber) {
+          alert(newName + ' is already added to the phonebook.')
+        } else if(window.confirm(newName + ' is already added to the phonebook, do you want to update the number?')) {
+          const id = item.id
+          const newObject = {
+            name: newName,
+            number: newNumber,
+            display: true
+          }
+          backend.update(id,newObject).then(newPerson => {
+            setPersons(persons.map(person => person.id !== id ? person : newPerson))
+            const newMessage = {
+              msg: newPerson.name + ' was updated successfully!',
+              type: 'message success'
+            }
+            setMessage(newMessage)
+            setTimeout(() => {
+              setMessage(null)
+            }, 3000)
+          }).catch(error => {
+            setMessage(
+              {
+                msg: `Person `+ newObject.name +` does not exist on the server. Please reload the page.`,
+                type: 'message error'
+              }
+            )
+            setTimeout(() => {
+              setMessage(null)
+            }, 3000)
+          })
+        }
       }
+      return
     })
     if (same === 1) {
       setNewName('')
@@ -90,6 +131,25 @@ const App = () => {
     }
     backend.create(nameObject).then(person => {
       setPersons(persons.concat(person))
+      const newMessage = {
+        msg: person.name + ' was added successfully!',
+        type: 'message success'
+      }
+      setMessage(newMessage)
+      setTimeout(() => {
+          setMessage(null)
+        }, 3000)
+
+    }).catch(error => {
+      setMessage(
+        {
+          msg: `Person creation unsuccesful.`,
+          type: 'message error'
+        }
+      )
+      setTimeout(() => {
+        setMessage(null)
+      }, 3000)
     })
     setNewName('')
     setNewNumber('')
@@ -119,14 +179,38 @@ const App = () => {
   }
 
   const deleteEntry = (event) => {
-    if(window.confirm('Really delete?')) {
-      backend.del(event.target.id)
+    if(window.confirm('Really delete ' + event.target.name +'?')) {
+      const name = event.target.name
+      backend.del(event.target.id).then(response => {
+        const newMessage = {
+          msg: 'Record was deleted successfully!',
+          type: 'message success'
+        }
+        setMessage(newMessage)
+        setTimeout(() => {
+          setMessage(null)
+        }, 3000)
+        backend.getAll().then(p => {
+          setPersons(p)
+        })
+      }).catch(error => {
+        setMessage(
+          {
+            msg: `Person `+ name +` was already removed from server. Please reload the page.`,
+            type: 'message error'
+          }
+        )
+        setTimeout(() => {
+          setMessage(null)
+        }, 3000)
+      })
     }
   }
 
   //The render
   return (
     <div>
+      <Notification message={message} />
       <h2>Phonebook</h2>
       <Filter search={search} searchChange={searchChange}/>
       <h2>Add new number</h2>

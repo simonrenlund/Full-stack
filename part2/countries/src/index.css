@@ -12,19 +12,7 @@ code {
     monospace;
 }
 
-.message {
-  background: lightgrey;
-  font-size: 20px;
-  border-style: solid;
-  border-radius: 5px;
-  padding: 10px;
-  margin-bottom: 10px;
-}
-
-.success {
-  color: green;
-}
-
-.error {
-  color: red;
+img {
+  max-width: 30%;
+  max-height: 30%;
 }

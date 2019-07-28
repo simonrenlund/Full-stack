@@ -2,21 +2,15 @@
   "persons": [
     {
       "name": "Simon",
-      "number": "045-1337296",
+      "number": "123123",
       "display": true,
       "id": 1
     },
     {
-      "name": "Tora",
-      "number": "0405151614",
+      "name": "Erik",
+      "number": "123123123",
       "display": true,
-      "id": 3
-    },
-    {
-      "name": "Kasper",
-      "number": "0451228209",
-      "display": true,
-      "id": 4
+      "id": 2
     }
   ]
 }
