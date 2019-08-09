@@ -55,18 +55,12 @@ const PersonForm = ({newName,newNumber,inputChange,addPerson}) => {
 
 const App = () => {
   //useStates
-  const [ persons, setPersons] = useState([/*
-    { name: 'Arto Hellas', number: '040-123456', display: true},
-    { name: 'Ada Lovelace', number: '39-44-5323523', display: true },
-    { name: 'Dan Abramov', number: '12-43-234345', display: true },
-    { name: 'Mary Poppendieck', number: '39-23-6423122', display: true }*/
-  ])
+  const [ persons, setPersons] = useState([])
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
   const [search, setSearch] = useState('')
   const [message, setMessage] = useState('')
   useEffect(() => {
-      //console.log('effect')
       backend
       .getAll()
       .then(p => {
@@ -82,18 +76,19 @@ const App = () => {
   const addPerson = (event) => {
     event.preventDefault()
     let same = 0
+    const newObject = {
+      name: newName,
+      number: newNumber,
+      display: true
+    }
+    //for-loop
     persons.forEach(function(item) {
+      const id = item.id
       if (item.name === newName) {
         same = 1
         if (item.number === newNumber) {
           alert(newName + ' is already added to the phonebook.')
         } else if(window.confirm(newName + ' is already added to the phonebook, do you want to update the number?')) {
-          const id = item.id
-          const newObject = {
-            name: newName,
-            number: newNumber,
-            display: true
-          }
           backend.update(id,newObject).then(newPerson => {
             setPersons(persons.map(person => person.id !== id ? person : newPerson))
             const newMessage = {
@@ -107,7 +102,7 @@ const App = () => {
           }).catch(error => {
             setMessage(
               {
-                msg: `Person `+ newObject.name +` does not exist on the server. Please reload the page.`,
+                msg: error.response.data.error,
                 type: 'message error'
               }
             )
@@ -119,37 +114,30 @@ const App = () => {
       }
       return
     })
-    if (same === 1) {
-      setNewName('')
-      setNewNumber('')
-      return
-    }
-    const nameObject = {
-      name: newName,
-      number: newNumber,
-      display: true
-    }
-    backend.create(nameObject).then(person => {
-      setPersons(persons.concat(person))
-      setMessage({
-        msg: person.name + ' was added successfully!',
-        type: 'message success'
-      })
-      setTimeout(() => {
+    //end
+    if (same === 0) {
+      backend.create(newObject).then(person => {
+        setPersons(persons.concat(person))
+        setMessage({
+          msg: person.name + ' was added successfully!',
+          type: 'message success'
+        })
+        setTimeout(() => {
+            setMessage(null)
+          }, 3000)
+
+      }).catch(error => {
+        setMessage(
+          {
+            msg: error.response.data.error,
+            type: 'message error'
+          }
+        )
+        setTimeout(() => {
           setMessage(null)
         }, 3000)
-
-    }).catch(error => {
-      setMessage(
-        {
-          msg: error.response.data.error,
-          type: 'message error'
-        }
-      )
-      setTimeout(() => {
-        setMessage(null)
-      }, 3000)
-    })
+      })
+    }
     setNewName('')
     setNewNumber('')
   }
