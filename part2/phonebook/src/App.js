@@ -142,7 +142,7 @@ const App = () => {
     }).catch(error => {
       setMessage(
         {
-          msg: `Person creation unsuccesful.`,
+          msg: error.response.data.error,
           type: 'message error'
         }
       )
