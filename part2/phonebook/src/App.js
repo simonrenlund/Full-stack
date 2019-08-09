@@ -131,11 +131,10 @@ const App = () => {
     }
     backend.create(nameObject).then(person => {
       setPersons(persons.concat(person))
-      const newMessage = {
+      setMessage({
         msg: person.name + ' was added successfully!',
         type: 'message success'
-      }
-      setMessage(newMessage)
+      })
       setTimeout(() => {
           setMessage(null)
         }, 3000)
@@ -166,7 +165,6 @@ const App = () => {
   const searchChange = (event) => {
     setSearch(event.target.value)
     const s = event.target.value.toLowerCase()
-    //const s = search.toLowerCase()
     persons.forEach(function(item) {
       const n = item.name.toLowerCase()
       if (n.includes(s) || s === '') {
