@@ -4,6 +4,7 @@ const app = express()
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const mongoose = require('mongoose')
+const config = require('./utils/config')
 
 const blogSchema = mongoose.Schema({
   title: String,
@@ -14,7 +15,7 @@ const blogSchema = mongoose.Schema({
 
 const Blog = mongoose.model('Blog', blogSchema)
 
-const mongoUrl = 'mongodb+srv://fullstack:1PXSmjzxCLFXmZcf@fullstackcluster-1hy1i.mongodb.net/phonebook?retryWrites=true&w=majority'
+const mongoUrl = config.MONGODB_URI
 mongoose.connect(mongoUrl, { useNewUrlParser: true }).then( () => {
   console.log('Connected to MongoDB')
 })
