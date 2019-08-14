@@ -7,10 +7,11 @@ const Blog = require('./models/blog')
 const config = require('./utils/config')
 const blogRouter = require('./controllers/blog')
 const middleware = require('./utils/middleware')
+const logger = require('./utils/logger')
 
 const mongoUrl = config.MONGODB_URI
 mongoose.connect(mongoUrl, { useNewUrlParser: true }).then( () => {
-  console.log('Connected to MongoDB')
+  logger.info('Connected to MongoDB')
 })
 
 app.use(cors())
