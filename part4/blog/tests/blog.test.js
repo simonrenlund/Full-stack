@@ -26,13 +26,20 @@ beforeEach( async() => {
 })
 
 describe('backend tests', () => {
-  test('blogs are returned as json', async () => {
+  test('blogs are returned as json', async() => {
     console.log('starting test')
     const response = await api
       .get('/api/blogs')
       .expect(200)
       .expect('Content-Type', /application\/json/)
     expect(response.body.length).toBe(initialBlogs.length)
+  })
+
+  test('entries contatin an "id"', async() => {
+    const response = await api
+      .get('/api/blogs')
+      .expect(200)
+    expect(response.body[0].id).toBeDefined()
   })
 })
 
