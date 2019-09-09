@@ -25,7 +25,7 @@ beforeEach( async() => {
   await Promise.all(promiseArray)
 })
 
-describe('GET tests', () => {
+describe('viewing all blog entries', () => {
   test('blogs are returned as json', async() => {
     const response = await api
       .get('/api/blogs')
@@ -42,7 +42,20 @@ describe('GET tests', () => {
   })
 })
 
-describe('POST tests', () => {
+describe('viewing a specific blog entry', () => {
+  test('returns the correct blog entry as json', async() => {
+    const res1 = await api
+      .get('/api/blogs')
+    const url = '/api/blogs/' + res1.body[0].id
+    const res = await api
+      .get(url)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    expect(res.body).toEqual(res1.body[0])
+  })
+})
+
+describe('adding a new blog entry', () => {
   test('correct POST-requests successfully create a new blog entry', async() => {
     const newBlog = {
       title: "123",
@@ -97,6 +110,44 @@ describe('POST tests', () => {
       .post('/api/blogs')
       .send(blog2)
       .expect(400)
+  })
+})
+
+describe('updating an entry', () => {
+  test('updating an entry returns 200 and the updated object', async() => {
+    updatedBlog =
+      {
+        title: "Go To Statement Considered Harmful",
+        author: "Edsger W. Dijkstra",
+        url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
+        likes: 10
+      }
+    const all = await api
+      .get('/api/blogs')
+    const url = '/api/blogs/' + all.body[0].id
+    const update = await api
+      .put(url)
+      .send(updatedBlog)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    const updated = await api
+      .get(url)
+      .expect(200)
+    expect(updated.body.likes).toEqual(updatedBlog.likes)
+  })
+})
+
+describe('deleting a specific blog entry', () => {
+    test('deleting an entry returns 204 and reduces the amount of entries by one', async() => {
+      const all = await api
+      .get('/api/blogs')
+    const url = '/api/blogs/' + all.body[0].id
+    const del = await api
+      .delete(url)
+      .expect(204)
+    const all2 = await api
+      .get('/api/blogs')
+    expect(all2.body.length).toBe(all.body.length-1)
   })
 })
 
