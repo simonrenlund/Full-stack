@@ -27,7 +27,6 @@ beforeEach( async() => {
 
 describe('backend tests', () => {
   test('blogs are returned as json', async() => {
-    console.log('starting test')
     const response = await api
       .get('/api/blogs')
       .expect(200)
@@ -40,6 +39,45 @@ describe('backend tests', () => {
       .get('/api/blogs')
       .expect(200)
     expect(response.body[0].id).toBeDefined()
+  })
+
+  test('correct POST-requests successfully create a new blog entry', async() => {
+    const newBlog = {
+      title: "123",
+      author: "321",
+      url: "http://xD.com",
+      likes: 6
+    }
+    const response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const res = await api
+      .get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    expect(res.body.length).toBe(initialBlogs.length + 1)
+  })
+
+  test('likes default to 0 if missing from request', async() => {
+    const newBlog = {
+      title: "123",
+      author: "321",
+      url: "http://xD.com"
+    }
+    const reponse = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const res = await api
+      .get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    expect(res.body[res.body.length-1].likes).toBe(0)
   })
 })
 
