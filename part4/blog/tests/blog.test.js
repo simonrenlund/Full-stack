@@ -25,7 +25,7 @@ beforeEach( async() => {
   await Promise.all(promiseArray)
 })
 
-describe('backend tests', () => {
+describe('GET tests', () => {
   test('blogs are returned as json', async() => {
     const response = await api
       .get('/api/blogs')
@@ -40,7 +40,9 @@ describe('backend tests', () => {
       .expect(200)
     expect(response.body[0].id).toBeDefined()
   })
+})
 
+describe('POST tests', () => {
   test('correct POST-requests successfully create a new blog entry', async() => {
     const newBlog = {
       title: "123",
@@ -60,14 +62,13 @@ describe('backend tests', () => {
       .expect('Content-Type', /application\/json/)
     expect(res.body.length).toBe(initialBlogs.length + 1)
   })
-
   test('likes default to 0 if missing from request', async() => {
     const newBlog = {
       title: "123",
       author: "321",
       url: "http://xD.com"
     }
-    const reponse = await api
+    const response = await api
       .post('/api/blogs')
       .send(newBlog)
       .expect(201)
@@ -78,6 +79,24 @@ describe('backend tests', () => {
       .expect(200)
       .expect('Content-Type', /application\/json/)
     expect(res.body[res.body.length-1].likes).toBe(0)
+  })
+  test('undefined title or url equals res 400 from server', async() => {
+    const blog1 = {
+      author: "asd",
+      url: "https://xD.com"
+    }
+    const blog2 = {
+      title: "asd",
+      author: "def"
+    }
+    const res1 = await api
+      .post('/api/blogs')
+      .send(blog1)
+      .expect(400)
+    const res2 = await api
+      .post('/api/blogs')
+      .send(blog2)
+      .expect(400)
   })
 })
 
