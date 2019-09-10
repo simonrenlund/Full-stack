@@ -4,8 +4,8 @@ const User = require('../models/user')
 
 usersRouter.get('/', async(req, res, next) => {
   try {
-    const users = await User.find({})
-    users = users.map(u => u.toJSON())
+    let users = await User.find({})
+    res.json(users.map(u => u.toJSON()))
   } catch (exception) {
     next(exception)
   }
