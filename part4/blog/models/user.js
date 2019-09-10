@@ -5,9 +5,14 @@ mongoose.set('useFindAndModify', false)
 const userSchema = mongoose.Schema({
   username: {
     type: String,
-    unique: true
+    unique: true,
+    required: true,
+    min: 3
   },
-  name: String,
+  name: {
+    type: String,
+    required: true
+  },
   passwordHash: String
 })
 
