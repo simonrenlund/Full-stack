@@ -5,7 +5,7 @@ const api = supertest(app)
 const User = require('../models/user')
 const helper = require('../utils/test_helper')
 
-describe('when there is initially one user at db', () => {
+describe('DB tests', () => {
   beforeEach( async() => {
     await User.deleteMany({})
     const user = new User({ username: 'root', password: 'sekret' })
@@ -49,6 +49,30 @@ describe('when there is initially one user at db', () => {
     expect(usersAtEnd.length).toBe(usersAtStart.length + 1)
     const usernames = usersAtEnd.map(u => u.username)
     expect(usernames).toContain(newUser.username)
+  })
+})
+
+describe('Request tests', () => {
+  test('GET request returns 200 and in json format', async() => {
+    await api
+      .get('/api/users')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+  })
+  test('A valid POST-request successfully creates a user', async() => {
+    const usersAtStart = await helper.usersInDb()
+    const newUser = {
+      username: 'asd',
+      name: 'dsa',
+      password: 'hunter2'
+    }
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    const usersAtEnd = await helper.usersInDb()
+    expect(usersAtEnd.length).toBe(usersAtStart.length + 1)
   })
 })
 
