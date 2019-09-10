@@ -8,7 +8,7 @@ const helper = require('../utils/test_helper')
 describe('DB tests', () => {
   beforeEach( async() => {
     await User.deleteMany({})
-    const user = new User({ username: 'root', password: 'sekret' })
+    const user = new User({ username: 'root', name: 'Superuser', password: 'sekret' })
     await user.save()
   })
 
@@ -31,7 +31,6 @@ describe('DB tests', () => {
     const usersAtEnd = await helper.usersInDb()
     expect(usersAtEnd.length).toBe(usersAtStart.length)
   })
-
   test('creation succeeds with a fresh username', async() => {
     const usersAtStart = await helper.usersInDb()
     const newUser = {
@@ -73,6 +72,55 @@ describe('Request tests', () => {
       .expect('Content-Type', /application\/json/)
     const usersAtEnd = await helper.usersInDb()
     expect(usersAtEnd.length).toBe(usersAtStart.length + 1)
+  })
+  test('creation fails with proper status code if username or name is missing', async() => {
+    badUser1 = {
+      name: 'Superuser',
+      password: 'salainen'
+    }
+    badUser2 = {
+      username: 'root2',
+      password: 'salainen'
+    }
+    await api
+      .post('/api/users')
+      .send(badUser1)
+      .expect(400)
+    await api
+      .post('/api/users')
+      .send(badUser2)
+      .expect(400)
+  })
+  test('creation fails with proper status code if username is too short', async() => {
+    badUser = {
+      username: 'r',
+      name: 'Superuser',
+      password: 'salainen'
+    }
+    await api
+      .post('/api/users')
+      .send(badUser)
+      .expect(400)
+  })
+  test('creation fails with proper status code if password is missing or too short', async() => {
+    pwMissing = {
+      username: 'root2',
+      name: 'Superuser'
+    }
+    pwShort = {
+      username: 'root3',
+      name: 'Superuser',
+      password: '12'
+    }
+    await api
+     .post('/api/users')
+     .send(pwMissing)
+     .expect(400)
+
+     await api
+      .post('/api/users')
+      .send(pwShort)
+      .expect(400)
   })
 })
 
