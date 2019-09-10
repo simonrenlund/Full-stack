@@ -3,17 +3,17 @@ const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
 const User = require('../models/user')
+const helper = require('../utils/user_helper')
 
 describe('when there is initially one user at db', () => {
-  beforeEach(async () => {
+  beforeEach(async() => {
     await User.deleteMany({})
     const user = new User({ username: 'root', password: 'sekret' })
     await user.save()
   })
 
-  test('creation succeeds with a fresh username', async () => {
-    const usersAtStart = await User.find({})
-    usersAtStart.map(u => u.toJSON())
+  test('creation succeeds with a fresh username', async() => {
+    const usersAtStart = await helper()
 
     const newUser = {
       username: 'mluukkai',
@@ -27,8 +27,7 @@ describe('when there is initially one user at db', () => {
       .expect(200)
       .expect('Content-Type', /application\/json/)
 
-    const usersAtEnd = await User.find({})
-    usersAtEnd.map(u => u.toJSON())
+    const usersAtEnd = await helper()
     expect(usersAtEnd.length).toBe(usersAtStart.length + 1)
 
     const usernames = usersAtEnd.map(u => u.username)
