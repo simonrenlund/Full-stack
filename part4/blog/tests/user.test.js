@@ -12,7 +12,7 @@ describe('DB tests', () => {
     await user.save()
   })
 
-  test('creation fails with proper statuscode and message if username already taken', async () => {
+  test('creation fails with proper statuscode and message if username already taken', async() => {
     const usersAtStart = await helper.usersInDb()
     const newUser = {
       username: 'root',
