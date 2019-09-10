@@ -3,6 +3,7 @@ const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
+const helper = require('../utils/test_helper')
 
 const initialBlogs = [
   {
@@ -71,8 +72,6 @@ describe('adding a new blog entry', () => {
 
     const res = await api
       .get('/api/blogs')
-      .expect(200)
-      .expect('Content-Type', /application\/json/)
     expect(res.body.length).toBe(initialBlogs.length + 1)
   })
   test('likes default to 0 if missing from request', async() => {
@@ -140,7 +139,7 @@ describe('updating an entry', () => {
 describe('deleting a specific blog entry', () => {
     test('deleting an entry returns 204 and reduces the amount of entries by one', async() => {
       const all = await api
-      .get('/api/blogs')
+        .get('/api/blogs')
     const url = '/api/blogs/' + all.body[0].id
     const del = await api
       .delete(url)
