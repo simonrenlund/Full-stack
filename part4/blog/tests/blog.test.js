@@ -3,7 +3,9 @@ const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const helper = require('../utils/test_helper')
+const jwt = require('jsonwebtoken')
 
 const initialBlogs = [
   {
@@ -169,15 +171,33 @@ describe('updating an entry', () => {
 
 describe('deleting a specific blog entry', () => {
     test('deleting an entry returns 204 and reduces the amount of entries by one', async() => {
+      const login = await api
+        .post('/api/login')
+        .send({
+          username: username,
+          password: password
+        })
+      const token = 'Bearer ' + login.body.token
+
+      const newBlog = {
+        title: "usertest",
+        author: "321",
+        url: "http://xD.com"
+      }
+      const post = await api
+        .post('/api/blogs/')
+        .set('Authorization', token)
+        .send(newBlog)
       const all = await api
         .get('/api/blogs')
-    const url = '/api/blogs/' + all.body[0].id
-    const del = await api
-      .delete(url)
-      .expect(204)
-    const all2 = await api
-      .get('/api/blogs')
-    expect(all2.body.length).toBe(all.body.length-1)
+      const url = '/api/blogs/' + post.body.id
+      const del = await api
+        .delete(url)
+        .set('Authorization', token)
+        .expect(204)
+      const all2 = await api
+        .get('/api/blogs')
+      expect(all2.body.length).toBe(all.body.length-1)
   })
 })
 
