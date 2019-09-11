@@ -150,6 +150,59 @@ describe('deleting a specific blog entry', () => {
   })
 })
 
+describe('user assignment', () => {
+  test('creating a new entry automatically assigns a user', async() => {
+    const newBlog = {
+      title: "usertest",
+      author: "321",
+      url: "http://xD.com"
+    }
+    const res = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      expect(res.body.user).toBeDefined()
+  })
+  test('GET-requests to blogs displays correct user fields', async() => {
+    const newBlog = {
+      title: "usertest",
+      author: "321",
+      url: "http://xD.com"
+    }
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+    const res = await api
+      .get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    const blog = res.body[2]
+    expect(blog.user.username).toBeDefined()
+    expect(blog.user.name).toBeDefined()
+    expect(blog.user.id).toBeDefined()
+  })
+  test('GET-request to user displays correct blogs', async() => {
+    const newBlog = {
+      title: "usertest",
+      author: "321",
+      url: "http://xD.com"
+    }
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+    const user = await api
+      .get('/api/users')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+    const userBlog = user.body[0].blogs[0]
+    expect(userBlog.url).toBeDefined()
+    expect(userBlog.title).toBeDefined()
+    expect(userBlog.author).toBeDefined()
+    expect(userBlog.id).toBeDefined()
+
+  })
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
