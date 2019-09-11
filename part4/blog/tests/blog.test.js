@@ -19,6 +19,9 @@ const initialBlogs = [
     likes: 7
   }
 ]
+const username = "asd"
+const password = "hunter2"
+
 beforeEach( async() => {
   await Blog.deleteMany({})
   const blogObjects = initialBlogs.map(blog => new Blog(blog))
@@ -58,6 +61,14 @@ describe('viewing a specific blog entry', () => {
 
 describe('adding a new blog entry', () => {
   test('correct POST-requests successfully create a new blog entry', async() => {
+    const login = await api
+      .post('/api/login')
+      .send({
+        username: username,
+        password: password
+      })
+    const token = 'Bearer ' + login.body.token
+
     const newBlog = {
       title: "123",
       author: "321",
@@ -66,6 +77,7 @@ describe('adding a new blog entry', () => {
     }
     const response = await api
       .post('/api/blogs')
+      .set('Authorization', token)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -75,6 +87,14 @@ describe('adding a new blog entry', () => {
     expect(res.body.length).toBe(initialBlogs.length + 1)
   })
   test('likes default to 0 if missing from request', async() => {
+    const login = await api
+      .post('/api/login')
+      .send({
+        username: username,
+        password: password
+      })
+    const token = 'Bearer ' + login.body.token
+
     const newBlog = {
       title: "123",
       author: "321",
@@ -82,6 +102,7 @@ describe('adding a new blog entry', () => {
     }
     const response = await api
       .post('/api/blogs')
+      .set( 'Authorization', token )
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -93,6 +114,14 @@ describe('adding a new blog entry', () => {
     expect(res.body[res.body.length-1].likes).toBe(0)
   })
   test('undefined title or url equals res 400 from server', async() => {
+    const login = await api
+      .post('/api/login')
+      .send({
+        username: username,
+        password: password
+      })
+    const token = 'Bearer ' + login.body.token
+
     const blog1 = {
       author: "asd",
       url: "https://xD.com"
@@ -103,10 +132,12 @@ describe('adding a new blog entry', () => {
     }
     const res1 = await api
       .post('/api/blogs')
+      .set('Authorization', token)
       .send(blog1)
       .expect(400)
     const res2 = await api
       .post('/api/blogs')
+      .set('Authorization', token)
       .send(blog2)
       .expect(400)
   })
@@ -152,6 +183,14 @@ describe('deleting a specific blog entry', () => {
 
 describe('user assignment', () => {
   test('creating a new entry automatically assigns a user', async() => {
+    const login = await api
+      .post('/api/login')
+      .send({
+        username: username,
+        password: password
+      })
+    const token = 'Bearer ' + login.body.token
+
     const newBlog = {
       title: "usertest",
       author: "321",
@@ -159,11 +198,20 @@ describe('user assignment', () => {
     }
     const res = await api
       .post('/api/blogs')
+      .set('Authorization', token)
       .send(newBlog)
       .expect(201)
       expect(res.body.user).toBeDefined()
   })
   test('GET-requests to blogs displays correct user fields', async() => {
+    const login = await api
+      .post('/api/login')
+      .send({
+        username: username,
+        password: password
+      })
+    const token = 'Bearer ' + login.body.token
+
     const newBlog = {
       title: "usertest",
       author: "321",
@@ -171,6 +219,7 @@ describe('user assignment', () => {
     }
     await api
       .post('/api/blogs')
+      .set('Authorization', token)
       .send(newBlog)
     const res = await api
       .get('/api/blogs')
@@ -182,6 +231,14 @@ describe('user assignment', () => {
     expect(blog.user.id).toBeDefined()
   })
   test('GET-request to user displays correct blogs', async() => {
+    const login = await api
+      .post('/api/login')
+      .send({
+        username: username,
+        password: password
+      })
+    const token = 'Bearer ' + login.body.token
+
     const newBlog = {
       title: "usertest",
       author: "321",
@@ -189,12 +246,13 @@ describe('user assignment', () => {
     }
     await api
       .post('/api/blogs')
+      .set('Authorization', token)
       .send(newBlog)
     const user = await api
       .get('/api/users')
       .expect(200)
       .expect('Content-Type', /application\/json/)
-    const userBlog = user.body[0].blogs[0]
+    const userBlog = user.body[2].blogs[0]
     expect(userBlog.url).toBeDefined()
     expect(userBlog.title).toBeDefined()
     expect(userBlog.author).toBeDefined()
