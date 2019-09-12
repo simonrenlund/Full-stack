@@ -5,7 +5,7 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 
 const Blogs = ({blogs}) => {
-  const blogMap = () => blogs.map(b => <Blog blog={b} />)
+  const blogMap = () => blogs.map((b,i) => <Blog blog={b} key={i} />)
   return(<div>{blogMap()}</div>)
 }
 
