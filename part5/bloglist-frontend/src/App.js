@@ -4,6 +4,15 @@ import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
+const Notification = ({ message }) => {
+  if (message === null) {
+    return null
+  }else {
+    return (<h1>{message}</h1>)
+  }
+
+}
+
 const Blogs = ({blogs}) => {
   const blogMap = () => blogs.map((b,i) => <Blog blog={b} key={i} />)
   return(<div>{blogMap()}</div>)
@@ -11,7 +20,7 @@ const Blogs = ({blogs}) => {
 
 
 const App = () => {
-  const [errorMessage, setErrorMessage] = useState('')
+  const [errorMessage, setErrorMessage] = useState(null)
   const [blogs, setBlogs] = useState([])
 
   const [username, setUsername] = useState('')
@@ -32,7 +41,6 @@ const App = () => {
 
     try {
       const user = await loginService.login({username, password})
-
       setUser(user)
       setUsername('')
       setPassword('')
@@ -46,6 +54,7 @@ const App = () => {
 
   return(
     <div>
+      <Notification message={errorMessage} />
       <h1>Bloglist frontend</h1>
       <p>Please login to continue.</p>
       <form onSubmit={handleLogin}>
