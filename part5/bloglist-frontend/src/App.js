@@ -8,7 +8,7 @@ const Notification = ({ message }) => {
   if (message === null) {
     return null
   }else {
-    return (<h1>{message}</h1>)
+    return (<h1 className="message">{message}</h1>)
   }
 
 }
@@ -21,7 +21,11 @@ const Blogs = ({blogs}) => {
 const App = () => {
   const [errorMessage, setErrorMessage] = useState(null)
   const [blogs, setBlogs] = useState([])
-
+  //blogform states
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [url, setUrl] = useState('')
+  //user states
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -34,12 +38,24 @@ const App = () => {
       )
   },[])
 
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+      setUser(user)
+      blogService.setToken(user.token)
+    }
+  },[])
+
   const handleLogin = async(event) => {
     event.preventDefault()
-    console.log('logging in with', username, password)
-
     try {
       const user = await loginService.login({username, password})
+
+      window.localStorage.setItem(
+        'loggedBlogappUser', JSON.stringify(user)
+      )
+      blogService.setToken(user.token)
       setUser(user)
       setUsername('')
       setPassword('')
@@ -47,8 +63,35 @@ const App = () => {
       setErrorMessage('Wrong credentials')
       setTimeout(() => {
         setErrorMessage(null)
-      }, 5000)
+      }, 3000)
     }
+  }
+
+  const handleLogout = () => {
+    window.localStorage.removeItem('loggedBlogappUser')
+    setUser('')
+  }
+
+  const blogPost = async(event) => {
+    event.preventDefault()
+    try {
+      const blog = {
+        "title": title,
+        "author": author,
+        "url": url,
+        "user": user.id
+      }
+      const postedBlog = await blogService.create(blog)
+
+      setErrorMessage(`Blog ${title} by ${author} successfully added.`)
+      setBlogs(blogs.concat(postedBlog))
+    } catch(exception) {
+      setErrorMessage(exception.message)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 3000)
+    }
+
   }
 
   const loginForm = () => (
@@ -79,15 +122,52 @@ const App = () => {
   )
 
   const blogForm = () => (
-    <p>Logged in.</p>
+    <div>
+      <p>Logged in as {user.name}. <button type="submit" onClick={handleLogout}>Logout</button></p>
+      <h3>Create new blog.</h3>
+      <form onSubmit={blogPost}>
+        <div>
+          title:
+            <input
+            type="text"
+            value={title}
+            name="Title"
+            onChange={({ target }) => setTitle(target.value)}
+          />
+        </div>
+        <div>
+          author:
+            <input
+            type="text"
+            value={author}
+            name="Author"
+            onChange={({ target }) => setAuthor(target.value)}
+          />
+        </div>
+        <div>
+          url:
+            <input
+            type="text"
+            value={url}
+            name="Url"
+            onChange={({ target }) => setUrl(target.value)}
+          />
+        </div>
+        <button type="submit">Post</button>
+      </form>
+      <h2>Blogs</h2>
+      {blogs.map((b,i) => <Blog blog={b} key={i} />)}
+    </div>
   )
 
   return(
     <div>
       <Notification message={errorMessage} />
       <h1>Bloglist frontend</h1>
-      {user === null && loginForm()}
-      {user !== null && blogForm()}
+      {user === null ?
+        loginForm() :
+        blogForm()
+      }
     </div>
   )
 }
