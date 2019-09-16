@@ -79,12 +79,14 @@ const App = () => {
         "title": title,
         "author": author,
         "url": url,
-        "user": user.id
       }
       const postedBlog = await blogService.create(blog)
 
       setErrorMessage(`Blog ${title} by ${author} successfully added.`)
       setBlogs(blogs.concat(postedBlog))
+      setTitle('')
+      setAuthor('')
+      setUrl('')
     } catch(exception) {
       setErrorMessage(exception.message)
       setTimeout(() => {
