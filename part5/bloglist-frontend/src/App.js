@@ -118,7 +118,7 @@ const App = () => {
         />
       </Togglable>
       <h2>Blogs</h2>
-      {blogs.map((b,i) => <Blog blog={b} key={i} />)}
+      {blogs.map((b,i) => <Blog b={b} key={i} />)}
     </div>
   )
 
