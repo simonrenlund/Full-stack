@@ -1,5 +1,4 @@
 import React, {useState, useEffect} from 'react'
-import axios from 'axios'
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
 import blogService from './services/blogs'
@@ -12,11 +11,6 @@ const Notification = ({ message }) => {
     return (<h1 className="message">{message}</h1>)
   }
 
-}
-
-const Blogs = ({blogs}) => {
-  const blogMap = () => blogs.map((b,i) => <Blog blog={b} key={i} />)
-  return(<div>{blogMap()}</div>)
 }
 
 const App = () => {
@@ -32,7 +26,7 @@ const App = () => {
   const [user, setUser] = useState(null)
 
   useEffect(() => {
-    const allBlogs = blogService
+    blogService
       .getAll()
       .then(b =>
         setBlogs(b)
