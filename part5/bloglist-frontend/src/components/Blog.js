@@ -32,13 +32,17 @@ const Blog = ({ b }) => {
     setBlog(updateBlog)
   }
 
+
+
   return (
   <div onClick={toggleVisibility} style={blogStyle}>
     {blog.title} {blog.author}
-    <br style={showWhenVis}></br>
-    <a style={showWhenVis} href={blog.url}>{blog.url}</a>
-    <div style={showWhenVis}>likes: {blog.likes} <button type="submit" onClick={handleLike}>like</button></div>
-    <div style={showWhenVis}>added by {blog.user.name}</div>
+    <div style={showWhenVis}>
+      <a href={blog.url}>{blog.url}</a>
+      <div>likes: {blog.likes} <button type="submit" onClick={handleLike}>like</button></div>
+      <div>added by {blog.user.name}</div>
+      <button type="submit" onClick={() => console.log('clicked!')}>remove</button>
+    </div>
   </div>
 )}
 
