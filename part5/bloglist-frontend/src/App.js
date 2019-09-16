@@ -31,8 +31,10 @@ const App = () => {
     blogService
       .getAll()
       .then(b =>
+        {
+        b.sort((a,b) => b.likes - a.likes)
         setBlogs(b)
-      )
+      })
   },[])
 
   useEffect(() => {
