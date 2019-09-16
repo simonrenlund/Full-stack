@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react'
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
+import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -105,15 +106,17 @@ const App = () => {
   const blogForm = () => (
     <div>
       <p>Logged in as {user.name}. <button type="submit" onClick={handleLogout}>Logout</button></p>
-      <BlogForm
-        title={title}
-        author={author}
-        url={url}
-        handleTitleChange={({ target }) => setTitle(target.value)}
-        handleAuthorChange={({ target }) => setAuthor(target.value)}
-        handleUrlChange={({ target }) => setUrl(target.value)}
-        blogPost={blogPost}
-      />
+      <Togglable buttonLabel="new blog">
+        <BlogForm
+          title={title}
+          author={author}
+          url={url}
+          handleTitleChange={({ target }) => setTitle(target.value)}
+          handleAuthorChange={({ target }) => setAuthor(target.value)}
+          handleUrlChange={({ target }) => setUrl(target.value)}
+          blogPost={blogPost}
+        />
+      </Togglable>
       <h2>Blogs</h2>
       {blogs.map((b,i) => <Blog blog={b} key={i} />)}
     </div>
