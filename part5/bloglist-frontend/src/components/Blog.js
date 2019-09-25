@@ -32,6 +32,20 @@ const Blog = ({ b }) => {
     setBlog(updateBlog)
   }
 
+  const handleDel = async(event) => {
+    try {
+      event.preventDefault()
+      if (window.confirm("Are you sure you want to delete " + blog.title + "?")) {
+        const id = blog.id
+        console.log(id)
+        await blogService.remove(id)
+        window.location.reload()
+      }
+    } catch(exception) {
+      console.log("del failed.")
+    }
+  }
+
 
 
   return (
@@ -41,7 +55,7 @@ const Blog = ({ b }) => {
       <a href={blog.url}>{blog.url}</a>
       <div>likes: {blog.likes} <button type="submit" onClick={handleLike}>like</button></div>
       <div>added by {blog.user.name}</div>
-      <button type="submit" onClick={() => console.log('clicked!')}>remove</button>
+      <button type="submit" id={blog.id} onClick={handleDel}>remove</button>
     </div>
   </div>
 )}
