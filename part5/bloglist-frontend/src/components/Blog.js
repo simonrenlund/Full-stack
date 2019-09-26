@@ -1,7 +1,7 @@
 import React,{useState} from 'react'
 import blogService from '../services/blogs'
 
-const Blog = ({ b }) => {
+const Blog = ({ b, u }) => {
   const [visible, setVisible] = useState(false)
   const [blog, setBlog] = useState(b)
 
@@ -46,7 +46,7 @@ const Blog = ({ b }) => {
     }
   }
 
-
+  const userVisibility = { display: u.username == blog.user.username ? '' : 'none' }
 
   return (
   <div onClick={toggleVisibility} style={blogStyle}>
@@ -55,7 +55,7 @@ const Blog = ({ b }) => {
       <a href={blog.url}>{blog.url}</a>
       <div>likes: {blog.likes} <button type="submit" onClick={handleLike}>like</button></div>
       <div>added by {blog.user.name}</div>
-      <button type="submit" id={blog.id} onClick={handleDel}>remove</button>
+      <button style={userVisibility} type="submit" id={blog.id} onClick={handleDel}>remove</button>
     </div>
   </div>
 )}
