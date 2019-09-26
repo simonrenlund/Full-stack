@@ -46,7 +46,7 @@ const Blog = ({ b, u }) => {
     }
   }
 
-  const userVisibility = { display: u.username == blog.user.username ? '' : 'none' }
+  const userVisibility = { display: u.username === blog.user.username ? '' : 'none' }
 
   return (
   <div onClick={toggleVisibility} style={blogStyle}>
