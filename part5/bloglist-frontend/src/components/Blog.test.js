@@ -43,8 +43,6 @@ describe('Blog', () => {
     const button = component.getByText('Testblog Simon R')
     fireEvent.click(button)
 
-    expect(component.container).toHaveTextContent(
-      'Testblog Simon R'
-    )
+    expect(component.container).toHaveTextContent('Testblog Simon Rhttp://xD.comlikes: 4 likeadded by Simonremove')
   })
 })
