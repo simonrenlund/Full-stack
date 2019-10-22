@@ -87,9 +87,9 @@ const App = () => {
 
       setErrorMessage(`Blog ${title} by ${author} successfully added.`)
       setBlogs(blogs.concat(postedBlog))
-      setTitle('')
-      setAuthor('')
-      setUrl('')
+      title.reset()
+      author.reset()
+      url.reset()
     } catch(exception) {
       setErrorMessage(exception.message)
       setTimeout(() => {
@@ -117,9 +117,9 @@ const App = () => {
           title={title}
           author={author}
           url={url}
-          handleTitleChange={({ target }) => setTitle(target.value)}
-          handleAuthorChange={({ target }) => setAuthor(target.value)}
-          handleUrlChange={({ target }) => setUrl(target.value)}
+          handleTitleChange={({ target }) => title.value(target.value)}
+          handleAuthorChange={({ target }) => author.value(target.value)}
+          handleUrlChange={({ target }) => url.value(target.value)}
           blogPost={blogPost}
         />
       </Togglable>
