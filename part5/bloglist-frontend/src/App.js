@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react'
+import  { useField } from './hooks'
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
@@ -19,12 +20,12 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState(null)
   const [blogs, setBlogs] = useState([])
   //blogform states
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
+  const title = useField('text')//[title, setTitle] = useState('')
+  const author = useField('text')//[author, setAuthor] = useState('')
+  const url = useField('text')//[url, setUrl] = useState('')
   //user states
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const username = useField('text')
+  const password = useField('text')
   const [user, setUser] = useState(null)
 
   useEffect(() => {
@@ -49,17 +50,19 @@ const App = () => {
   const handleLogin = async(event) => {
     event.preventDefault()
     try {
-      const user = await loginService.login({username, password})
+      const user = await loginService.login({username: username.value, password: password.value})
 
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
       )
       blogService.setToken(user.token)
       setUser(user)
-      setUsername('')
-      setPassword('')
+      username.reset()
+      username.reset()
     } catch(exception) {
       setErrorMessage('Wrong credentials')
+      username.reset()
+      password.reset()
       setTimeout(() => {
         setErrorMessage(null)
       }, 3000)
@@ -98,10 +101,10 @@ const App = () => {
 
   const loginForm = () => (
     <LoginForm
-      username={username}
-      password={password}
-      handleUsernameChange={({ target }) => setUsername(target.value)}
-      handlePasswordChange={({ target }) => setPassword(target.value)}
+      username={username.value}
+      password={password.value}
+      handleUsernameChange={username.onChange}
+      handlePasswordChange={password.onChange}
       handleLogin={handleLogin}
     />
   )
