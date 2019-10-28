@@ -23,21 +23,22 @@ const reducer = (state = initialState, action) => {
   console.log('state now: ', state)
   console.log('action', action)
   let newState = state
-  if (action.type === 'VOTE') {
-    for (let i = 0;i<newState.length;i++) {
-      if (newState[i].id === action.data) {
-        newState[i].votes += 1
-        newState.sort((a,b) => (a.votes < b.votes) ? 1 : -1)
-        return newState
+  switch (action.type) {
+    case 'VOTE':
+      for (let i = 0;i<newState.length;i++) {
+        if (newState[i].id === action.data) {
+          newState[i].votes += 1
+          newState.sort((a,b) => (a.votes < b.votes) ? 1 : -1)
+          return newState
+        }
       }
+      return state
+    case 'ADD':
+      const anecdote = asObject(action.data)
+      return newState.concat(anecdote)
+    default:
+      return state
     }
-    return state
-  } else if (action.type === 'ADD') {
-    const anecdote = asObject(action.data)
-    return newState.concat(anecdote)
-  } else {
-    return state
-  }
 }
 
 export default reducer
