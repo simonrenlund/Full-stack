@@ -1,12 +1,26 @@
 import React from 'react'
 import { voteAnecdote } from '../reducers/anecdoteReducer'
+import { setNotification, removeNotification } from '../reducers/notificationReducer'
 
 const AnecdoteList = (props) => {
-  const anecdotes = props.store.getState()
+  const anecdotes = props.store.getState().anecdotes
 
-  const vote = (id) => {
+  const vote = async(id) => {
     console.log('vote', id)
     props.store.dispatch(voteAnecdote(id))
+    let anecdotes = props.store.getState().anecdotes
+    for (let i = 0;i<anecdotes.length;i++) {
+      if (anecdotes[i].id===id) {
+        anecdotes = anecdotes[i]
+        break
+      }
+    }
+    const str = 'You voted for ' + anecdotes.content
+    props.store.dispatch(setNotification(str))
+    setTimeout(() => {
+      props.store.dispatch(removeNotification())
+    }, 5000)
+
   }
 
   return(
