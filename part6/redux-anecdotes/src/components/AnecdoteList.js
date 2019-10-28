@@ -3,7 +3,16 @@ import { voteAnecdote } from '../reducers/anecdoteReducer'
 import { setNotification, removeNotification } from '../reducers/notificationReducer'
 
 const AnecdoteList = (props) => {
-  const anecdotes = props.store.getState().anecdotes
+  const { anecdotes, filter } = props.store.getState()
+
+  const anecdotesToShow = () => {
+    if (filter === '') {
+      return anecdotes
+    } else {
+      console.log(filter.toLowerCase())
+      return anecdotes.filter(a => a.content.toLowerCase().includes(filter.toLowerCase()))
+    }
+  }
 
   const vote = async(id) => {
     console.log('vote', id)
@@ -25,7 +34,7 @@ const AnecdoteList = (props) => {
 
   return(
     <div>
-      {anecdotes.map(anecdote =>
+      {anecdotesToShow().map(anecdote =>
         <div key={anecdote.id}>
           <div>
             {anecdote.content}
