@@ -1,12 +1,15 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { addAnecdote } from '../reducers/anecdoteReducer'
+import anecdoteService from '../services/anecdotes'
 
 const AnecdoteForm = (props) => {
-  const handleSubmit = (event) => {
+  const handleSubmit = async(event) => {
     event.preventDefault()
-    props.addAnecdote(event.target.anecdote.value)
+    const content = event.target.anecdote.value
     event.target.anecdote.value = ''
+    const newAnecdote = await anecdoteService.createNew(content)
+    props.addAnecdote(newAnecdote)
   }
 
   return(

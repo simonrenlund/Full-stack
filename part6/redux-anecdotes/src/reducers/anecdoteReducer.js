@@ -23,8 +23,7 @@ const reducer = (state = [], action) => {
       }
       return state.map(a => a.id !==action.data ? a : changedAnecdote).sort((a,b) => (a.votes < b.votes) ? 1 : -1)
     case 'ADD':
-      const anecdote = asObject(action.data)
-      return state.concat(anecdote)
+      return state.concat(action.data)
     case 'INIT':
       return action.data
     default:
@@ -34,10 +33,10 @@ const reducer = (state = [], action) => {
 
 export default reducer
 
-export const addAnecdote = (anecdote) => {
+export const addAnecdote = (data) => {
   return {
     type: 'ADD',
-    data: anecdote
+    data,
   }
 }
 
