@@ -1,17 +1,23 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { voteAnecdote } from '../reducers/anecdoteReducer'
 import { setNotification, removeNotification } from '../reducers/notificationReducer'
 
 const AnecdoteList = (props) => {
+  const [time,setTime] = useState(null)
   const vote = (id) => {
     props.voteAnecdote(id)
     const anecdote = props.visibleAnecdotes.find(a => a.id === id)
     const str = 'You voted for ' + anecdote.content
+    console.log(time)
+    if (time) {
+      clearTimeout(time)
+      console.log('cleared!')
+    }
     props.setNotification(str)
-    setTimeout(()=>{
+    setTime(setTimeout(()=>{
       props.removeNotification()
-    },5000)
+    },5000)) 
   }
 
   return(
