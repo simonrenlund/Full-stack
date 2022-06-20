@@ -4,19 +4,16 @@ import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
+import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import { connect } from 'react-redux'
+import {
+    setNotification,
+    removeNotification,
+} from './reducers/notificationReducer'
 
-const Notification = ({ message }) => {
-    if (message === null) {
-        return null
-    } else {
-        return <h1 className="message">{message}</h1>
-    }
-}
-
-const App = () => {
-    const [errorMessage, setErrorMessage] = useState(null)
+const App = (props) => {
     const [blogs, setBlogs] = useState([])
     //blogform states
     const title = useField('text') //[title, setTitle] = useState('')
@@ -60,11 +57,11 @@ const App = () => {
             username.reset()
             username.reset()
         } catch (exception) {
-            setErrorMessage('Wrong credentials')
+            props.setNotification('Wrong credentials')
             username.reset()
             password.reset()
             setTimeout(() => {
-                setErrorMessage(null)
+                props.removeNotification()
             }, 3000)
         }
     }
@@ -85,15 +82,17 @@ const App = () => {
             }
             const postedBlog = await blogService.create(blog)
 
-            setErrorMessage(`Blog ${title} by ${author} successfully added.`)
+            props.setNotification(
+                `Blog ${title} by ${author} successfully added.`
+            )
             setBlogs(blogs.concat(postedBlog))
             title.reset()
             author.reset()
             url.reset()
         } catch (exception) {
-            setErrorMessage(exception.message)
+            props.setNotification(exception.message)
             setTimeout(() => {
-                setErrorMessage(null)
+                props.removeNotification()
             }, 3000)
         }
     }
@@ -140,11 +139,16 @@ const App = () => {
 
     return (
         <div>
-            <Notification message={errorMessage} />
+            <Notification />
             <h1>Bloglist frontend</h1>
             {user === null ? loginForm() : blogForm()}
         </div>
     )
 }
 
-export default App
+const mapDispatchToProps = {
+    setNotification,
+    removeNotification,
+}
+
+export default connect(null, mapDispatchToProps)(App)
