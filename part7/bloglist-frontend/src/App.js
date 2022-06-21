@@ -6,6 +6,7 @@ import {
   setErrorMessage,
   removeMessage,
 } from './reducers/notificationReducer'
+import { initBlogs, addBlog } from './reducers/blogReducer'
 import { connect } from 'react-redux'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
@@ -36,6 +37,7 @@ const App = (props) => {
   const getAllBlogs = async () => {
     const blogs = await blogService.getAll()
     setAllBlogs(blogs)
+    props.initBlogs(blogs)
   }
 
   const handleLogin = async (event) => {
@@ -71,6 +73,7 @@ const App = (props) => {
       blogFormRef.current.toggleVisibility()
       const createdBlog = await blogService.create(BlogToAdd)
       props.setSuccessMessage(`Blog ${BlogToAdd.title} was successfully added`)
+      props.addBlog(createdBlog)
       setAllBlogs(allBlogs.concat(createdBlog))
       setTimeout(() => {
         props.removeMessage()
@@ -150,7 +153,7 @@ const App = (props) => {
           <Togglable buttonLabel="Add new blog" ref={blogFormRef}>
             <BlogForm createBlog={createBlog} />
           </Togglable>
-          {allBlogs.sort(byLikes).map((blog) => (
+          {props.reduxBlogs.sort(byLikes).map((blog) => (
             <Blog
               key={blog.id}
               blog={blog}
@@ -158,14 +161,30 @@ const App = (props) => {
               deleteBlog={deleteBlog}
             />
           ))}
+          {/* {allBlogs.sort(byLikes).map((blog) => (
+            <Blog
+              key={blog.id}
+              blog={blog}
+              updateBlog={updateBlog}
+              deleteBlog={deleteBlog}
+            />
+          ))} */}
         </div>
       )}
     </div>
   )
 }
 
-export default connect(null, {
+const mapStateToProps = (state) => {
+  return { reduxBlogs: state.blogs }
+}
+
+const mapDispatchToProps = {
   setSuccessMessage,
   setErrorMessage,
   removeMessage,
-})(App)
+  initBlogs,
+  addBlog,
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App)
