@@ -1,82 +1,65 @@
 import React, { useState } from 'react'
-import blogService from '../services/blogs'
+import PropTypes from 'prop-types'
 
-const Blog = ({ b, u }) => {
-    const [visible, setVisible] = useState(false)
-    const [blog, setBlog] = useState(b)
+const Blog = (props) => {
+  const blog = props.blog
+  const [blogObject, setBlogObject] = useState(blog)
+  const [visible, setVisible] = useState(false)
+  const showWhenVisible = { display: visible ? '' : 'none' }
 
-    const blogStyle = {
-        paddingTop: 10,
-        paddingLeft: 2,
-        border: 'solid',
-        borderWidth: 1,
-        marginBottom: 5,
+  const toggleVisibility = () => {
+    setVisible(!visible)
+  }
+
+  const buttonLabel = visible ? 'hide' : 'view'
+
+  const increaseLikes = () => {
+    const updatedBlog = {
+      ...blog,
+      likes: blog.likes + 1,
     }
-    const showWhenVis = { display: visible ? '' : 'none' }
+    props.updateBlog(updatedBlog)
+    setBlogObject(updatedBlog)
+  }
 
-    const toggleVisibility = () => {
-        setVisible(!visible)
-    }
+  const removeBlog = () => props.deleteBlog(blog)
 
-    const handleLike = async (event) => {
-        event.preventDefault()
-        const likes = blog.likes + 1
-        const likedBlog = {
-            user: blog.user.id,
-            likes: likes,
-            author: blog.author,
-            title: blog.title,
-            url: blog.url,
-        }
-        const updateBlog = await blogService.update(blog.id, likedBlog)
-        setBlog(updateBlog)
-    }
+  const blogStyle = {
+    paddingTop: 10,
+    paddingLeft: 2,
+    border: 'solid',
+    borderWidth: 1,
+    marginBottom: 5,
+  }
 
-    const handleDel = async (event) => {
-        try {
-            event.preventDefault()
-            if (
-                window.confirm(
-                    'Are you sure you want to delete ' + blog.title + '?'
-                )
-            ) {
-                const id = blog.id
-                console.log(id)
-                await blogService.remove(id)
-                window.location.reload()
-            }
-        } catch (exception) {
-            console.log('del failed.')
-        }
-    }
+  return (
+    <div style={blogStyle} className="blog">
+      <div>
+        <p>
+          {blog.title} - {blog.author}{' '}
+          <button onClick={toggleVisibility}>{buttonLabel}</button>
+        </p>
+      </div>
+      <div style={showWhenVisible}>
+        <p>{blog.url}</p>
+        <p>
+          {blogObject.likes}{' '}
+          <button id="like-button" onClick={increaseLikes}>
+            like
+          </button>
+        </p>
+        <button id="remove" onClick={removeBlog}>
+          remove
+        </button>
+      </div>
+    </div>
+  )
+}
 
-    const userVisibility = {
-        display: u.username === blog.user.username ? '' : 'none',
-    }
-
-    return (
-        <div onClick={toggleVisibility} style={blogStyle}>
-            {blog.title} {blog.author}
-            <div style={showWhenVis}>
-                <a href={blog.url}>{blog.url}</a>
-                <div>
-                    likes: {blog.likes}{' '}
-                    <button type="submit" onClick={handleLike}>
-                        like
-                    </button>
-                </div>
-                <div>added by {blog.user.name}</div>
-                <button
-                    style={userVisibility}
-                    type="submit"
-                    id={blog.id}
-                    onClick={handleDel}
-                >
-                    remove
-                </button>
-            </div>
-        </div>
-    )
+Blog.propTypes = {
+  blog: PropTypes.object.isRequired,
+  updateBlog: PropTypes.func.isRequired,
+  deleteBlog: PropTypes.func.isRequired,
 }
 
 export default Blog

@@ -1,42 +1,46 @@
 import React from 'react'
 import '@testing-library/jest-dom/extend-expect'
-import { render, cleanup, fireEvent } from '@testing-library/react'
+import { render, fireEvent } from '@testing-library/react'
 import Blog from './Blog'
 
-afterEach(cleanup)
+describe('Blog component tests', () => {
+  let blog = {
+    title: 'React patterns',
+    author: 'Michael Chan',
+    url: 'https://reactpatterns.com/',
+    likes: 7,
+  }
 
-describe('Blog', () => {
-    let component
-    beforeEach(() => {
-        const blog = {
-            title: 'Testblog',
-            author: 'Simon R',
-            likes: 4,
-            url: 'http://xD.com',
-            user: {
-                username: 'SimppL',
-                name: 'Simon',
-                id: '5d7b5f534e0eaa5f68dc28dd',
-            },
-        }
-        const user = {
-            username: 'SimppL',
-            name: 'Simon',
-        }
+  let mockUpdateBlog = jest.fn()
+  let mockDeleteBlog = jest.fn()
 
-        component = render(<Blog b={blog} u={user} />)
-    })
+  test('renders title and author', () => {
+    const component = render(
+      <Blog
+        blog={blog}
+        updateBlog={mockUpdateBlog}
+        deleteBlog={mockDeleteBlog}
+      />
+    )
+    expect(component.container).toHaveTextContent(
+      'React patterns - Michael Chan'
+    )
+  })
 
-    test('only author and title shown by default', () => {
-        expect(component.container).toHaveTextContent('Testblog Simon R')
-    })
+  test('clicking the view button displays url and number of likes', () => {
+    const component = render(
+      <Blog
+        blog={blog}
+        updateBlog={mockUpdateBlog}
+        deleteBlog={mockDeleteBlog}
+      />
+    )
 
-    test('clicking blog expands the entry', () => {
-        const button = component.getByText('Testblog Simon R')
-        fireEvent.click(button)
+    const button = component.getByText('view')
+    fireEvent.click(button)
 
-        expect(component.container).toHaveTextContent(
-            'Testblog Simon Rhttp://xD.comlikes: 4 likeadded by Simonremove'
-        )
-    })
+    expect(component.container).toHaveTextContent('https://reactpatterns.com/')
+
+    expect(component.container).toHaveTextContent('7')
+  })
 })
