@@ -7,6 +7,7 @@ import {
   removeMessage,
 } from './reducers/notificationReducer'
 import { initBlogs, addBlog, likeBlog, delBlog } from './reducers/blogReducer'
+import { userLogin, userLogout } from './reducers/loginReducer'
 import { connect } from 'react-redux'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
@@ -28,7 +29,8 @@ const App = (props) => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      setUser(user)
+      props.userLogin(user)
+      //setUser(user)
       blogService.setToken(user.token)
       getAllBlogs()
     }
@@ -49,7 +51,8 @@ const App = (props) => {
       })
 
       window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
-      setUser(user)
+      props.userLogin(user)
+      //setUser(user)
       blogService.setToken(user.token)
       setUsername('')
       setPassword('')
@@ -65,7 +68,8 @@ const App = (props) => {
   const handleLogout = async (event) => {
     event.preventDefault()
     window.localStorage.removeItem('loggedBlogappUser')
-    setUser(null)
+    props.userLogout()
+    //setUser(null)
   }
 
   const createBlog = async (BlogToAdd) => {
@@ -136,7 +140,7 @@ const App = (props) => {
     <div>
       <h2>Blogs</h2>
       <Notification />
-      {user === null ? (
+      {props.reduxLogin === null ? (
         <LoginForm
           handleLogin={handleLogin}
           username={username}
@@ -147,7 +151,7 @@ const App = (props) => {
       ) : (
         <div>
           <p>
-            {user.name} logged in
+            {props.reduxLogin.name} logged in
             <button onClick={handleLogout} type="submit">
               logout
             </button>
@@ -178,7 +182,7 @@ const App = (props) => {
 }
 
 const mapStateToProps = (state) => {
-  return { reduxBlogs: state.blogs }
+  return { reduxBlogs: state.blogs, reduxLogin: state.login }
 }
 
 const mapDispatchToProps = {
@@ -189,6 +193,8 @@ const mapDispatchToProps = {
   addBlog,
   likeBlog,
   delBlog,
+  userLogin,
+  userLogout,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App)
