@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 const Blog = (props) => {
   const blog = props.blog
-  const [blogObject, setBlogObject] = useState(blog)
+  //const [blogObject, setBlogObject] = useState(blog)
   const [visible, setVisible] = useState(false)
   const showWhenVisible = { display: visible ? '' : 'none' }
 
@@ -19,7 +19,7 @@ const Blog = (props) => {
       likes: blog.likes + 1,
     }
     props.updateBlog(updatedBlog)
-    setBlogObject(updatedBlog)
+    //setBlogObject(updatedBlog)
   }
 
   const removeBlog = () => props.deleteBlog(blog)
@@ -43,7 +43,7 @@ const Blog = (props) => {
       <div style={showWhenVisible}>
         <p>{blog.url}</p>
         <p>
-          {blogObject.likes}{' '}
+          {blog.likes}{' '}
           <button id="like-button" onClick={increaseLikes}>
             like
           </button>

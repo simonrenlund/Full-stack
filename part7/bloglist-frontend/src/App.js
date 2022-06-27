@@ -6,7 +6,7 @@ import {
   setErrorMessage,
   removeMessage,
 } from './reducers/notificationReducer'
-import { initBlogs, addBlog } from './reducers/blogReducer'
+import { initBlogs, addBlog, likeBlog, delBlog } from './reducers/blogReducer'
 import { connect } from 'react-redux'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
@@ -15,7 +15,7 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 
 const App = (props) => {
-  const [allBlogs, setAllBlogs] = useState([])
+  //const [allBlogs, setAllBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   /*   const [errorMessage, setErrorMessage] = useState(null)
@@ -36,7 +36,7 @@ const App = (props) => {
 
   const getAllBlogs = async () => {
     const blogs = await blogService.getAll()
-    setAllBlogs(blogs)
+    //setAllBlogs(blogs)
     props.initBlogs(blogs)
   }
 
@@ -74,7 +74,7 @@ const App = (props) => {
       const createdBlog = await blogService.create(BlogToAdd)
       props.setSuccessMessage(`Blog ${BlogToAdd.title} was successfully added`)
       props.addBlog(createdBlog)
-      setAllBlogs(allBlogs.concat(createdBlog))
+      //setAllBlogs(allBlogs.concat(createdBlog))
       setTimeout(() => {
         props.removeMessage()
       }, 5000)
@@ -89,14 +89,15 @@ const App = (props) => {
   const updateBlog = async (BlogToUpdate) => {
     try {
       const updatedBlog = await blogService.update(BlogToUpdate)
+      props.likeBlog(updatedBlog.id)
       props.setSuccessMessage(
         `Blog ${BlogToUpdate.title} was successfully updated`
       )
-      setAllBlogs(
+      /* setAllBlogs(
         allBlogs.map((blog) =>
           blog.id !== BlogToUpdate.id ? blog : updatedBlog
         )
-      )
+      ) */
       setTimeout(() => {
         props.removeMessage()
       }, 5000)
@@ -115,7 +116,8 @@ const App = (props) => {
         props.setSuccessMessage(
           `Blog ${BlogToDelete.title} was successfully deleted`
         )
-        setAllBlogs(allBlogs.filter((blog) => blog.id !== BlogToDelete.id))
+        props.delBlog(BlogToDelete.id)
+        //setAllBlogs(allBlogs.filter((blog) => blog.id !== BlogToDelete.id))
         setTimeout(() => {
           props.removeMessage()
         }, 5000)
@@ -185,6 +187,8 @@ const mapDispatchToProps = {
   removeMessage,
   initBlogs,
   addBlog,
+  likeBlog,
+  delBlog,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App)
