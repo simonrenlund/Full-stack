@@ -8,12 +8,14 @@ import {
 } from './reducers/notificationReducer'
 import { initBlogs, addBlog, likeBlog, delBlog } from './reducers/blogReducer'
 import { userLogin, userLogout } from './reducers/loginReducer'
+import { initUsers } from './reducers/userReducer'
 import { connect } from 'react-redux'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import User from './components/User'
 
 const App = (props) => {
   //const [allBlogs, setAllBlogs] = useState([])
@@ -32,6 +34,7 @@ const App = (props) => {
       props.userLogin(user)
       //setUser(user)
       blogService.setToken(user.token)
+      getAllUsers()
       getAllBlogs()
     }
   }, [])
@@ -40,6 +43,11 @@ const App = (props) => {
     const blogs = await blogService.getAll()
     //setAllBlogs(blogs)
     props.initBlogs(blogs)
+  }
+
+  const getAllUsers = async () => {
+    const users = await blogService.getUsers()
+    props.initUsers(users)
   }
 
   const handleLogin = async (event) => {
@@ -57,7 +65,6 @@ const App = (props) => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      console.log(props)
       props.setErrorMessage('Wrong credentials')
       setTimeout(() => {
         props.removeMessage()
@@ -156,6 +163,10 @@ const App = (props) => {
               logout
             </button>
           </p>
+          <h2>Users</h2>
+          {props.reduxUsers.length > 0
+            ? props.reduxUsers.map((u) => <User key={u.id} user={u} />)
+            : null}
           <Togglable buttonLabel="Add new blog" ref={blogFormRef}>
             <BlogForm createBlog={createBlog} />
           </Togglable>
@@ -182,7 +193,11 @@ const App = (props) => {
 }
 
 const mapStateToProps = (state) => {
-  return { reduxBlogs: state.blogs, reduxLogin: state.login }
+  return {
+    reduxBlogs: state.blogs,
+    reduxLogin: state.login,
+    reduxUsers: state.users,
+  }
 }
 
 const mapDispatchToProps = {
@@ -195,6 +210,7 @@ const mapDispatchToProps = {
   delBlog,
   userLogin,
   userLogout,
+  initUsers,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App)
